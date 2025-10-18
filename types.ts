@@ -1,5 +1,4 @@
-
-export type View = 'Dashboard' | 'Orders' | 'Holdings' | 'Positions' | 'Funds' | 'Apps';
+export type View = 'Dashboard' | 'Orders' | 'Holdings' | 'Positions' | 'Funds' | 'Apps' | 'Market';
 
 export interface Stock {
   symbol: string;
@@ -7,6 +6,10 @@ export interface Stock {
   price: number;
   change: number;
   changePercent: number;
+  volume?: number;
+  open?: number;
+  high?: number;
+  low?: number;
 }
 
 export interface Index extends Stock {}
@@ -41,4 +44,29 @@ export interface Order {
     avgPrice: number;
     status: 'COMPLETE' | 'PENDING' | 'REJECTED';
     time: string;
+}
+
+export interface FundDetails {
+    equity: {
+        openingBalance: number;
+        payin: number;
+        payout: number;
+        span: number;
+        deliveryMargin: number;
+        exposure: number;
+        optionsPremium: number;
+        totalMargin: number;
+        availableMargin: number;
+    },
+    commodity: {
+        openingBalance: number;
+        payin: number;
+        payout: number;
+        span: number;
+        deliveryMargin: number;
+        exposure: number;
+        optionsPremium: number;
+        totalMargin: number;
+        availableMargin: number;
+    }
 }

@@ -1,5 +1,4 @@
-
-import { Stock, Index, Holding, Position, Order } from './types';
+import { Stock, Index, Holding, Position, Order, FundDetails } from './types';
 
 export const MOCK_INDICES: Index[] = [
   { symbol: 'NIFTY 50', name: 'NIFTY 50', price: 23501.10, change: 183.45, changePercent: 0.78 },
@@ -17,6 +16,20 @@ export const MOCK_WATCHLIST: Stock[] = [
   { symbol: 'SBIN', name: 'State Bank of India', price: 843.50, change: 10.30, changePercent: 1.23 },
   { symbol: 'KOTAKBANK', name: 'Kotak Mahindra Bank', price: 1774.20, change: -1.05, changePercent: -0.06 },
   { symbol: 'WIPRO', name: 'Wipro Ltd.', price: 490.85, change: 1.60, changePercent: 0.33 },
+];
+
+export const MOCK_ALL_STOCKS: Stock[] = [
+  ...MOCK_WATCHLIST,
+  { symbol: 'TATAMOTORS', name: 'Tata Motors Ltd.', price: 975.30, change: -5.15, changePercent: -0.53, volume: 15700000, open: 980.00, high: 982.50, low: 971.00 },
+  { symbol: 'ITC', name: 'ITC Ltd.', price: 423.50, change: -2.10, changePercent: -0.49, volume: 12300000, open: 425.00, high: 426.50, low: 422.00 },
+  { symbol: 'HINDUNILVR', name: 'Hindustan Unilever', price: 2540.80, change: 15.20, changePercent: 0.60, volume: 1800000, open: 2525.00, high: 2550.00, low: 2520.10 },
+  { symbol: 'LT', name: 'Larsen & Toubro', price: 3590.10, change: 30.50, changePercent: 0.86, volume: 950000, open: 3560.00, high: 3600.00, low: 3555.50 },
+  { symbol: 'AXISBANK', name: 'Axis Bank Ltd.', price: 1225.40, change: 11.80, changePercent: 0.97, volume: 7500000, open: 1215.00, high: 1230.00, low: 1212.00 },
+  { symbol: 'BAJFINANCE', name: 'Bajaj Finance Ltd.', price: 7120.00, change: -80.25, changePercent: -1.11, volume: 800000, open: 7200.00, high: 7210.00, low: 7105.00 },
+  { symbol: 'MARUTI', name: 'Maruti Suzuki India', price: 12850.50, change: 150.75, changePercent: 1.19, volume: 450000, open: 12700.00, high: 12900.00, low: 12680.00 },
+  { symbol: 'ASIANPAINT', name: 'Asian Paints Ltd.', price: 2880.00, change: 5.40, changePercent: 0.19, volume: 1100000, open: 2875.00, high: 2895.00, low: 2870.00 },
+  { symbol: 'TITAN', name: 'Titan Company Ltd.', price: 3410.20, change: -25.80, changePercent: -0.75, volume: 1300000, open: 3435.00, high: 3440.00, low: 3405.00 },
+  { symbol: 'ULTRACEMCO', name: 'UltraTech Cement', price: 10850.00, change: 120.00, changePercent: 1.12, volume: 350000, open: 10730.00, high: 10900.00, low: 10710.00 },
 ];
 
 
@@ -39,3 +52,28 @@ export const MOCK_ORDERS: Order[] = [
     { id: '2345681', symbol: 'RELIANCE', type: 'LIMIT', side: 'BUY', qty: 5, avgPrice: 2950.00, status: 'PENDING', time: '13:15:40' },
     { id: '2345682', symbol: 'TCS', type: 'LIMIT', side: 'BUY', qty: 10, avgPrice: 3800.00, status: 'REJECTED', time: '14:02:33' }
 ];
+
+export const MOCK_FUND_DETAILS: FundDetails = {
+    equity: {
+        openingBalance: 150000.00,
+        payin: 25000.00,
+        payout: 0.00,
+        span: 35000.00,
+        deliveryMargin: 12000.00,
+        exposure: 8000.00,
+        optionsPremium: 5000.00,
+        totalMargin: 60000.00,
+        availableMargin: 115000.00
+    },
+    commodity: {
+        openingBalance: 50000.00,
+        payin: 0.00,
+        payout: 10000.00,
+        span: 15000.00,
+        deliveryMargin: 0.00,
+        exposure: 2000.00,
+        optionsPremium: 1000.00,
+        totalMargin: 18000.00,
+        availableMargin: 22000.00
+    }
+};

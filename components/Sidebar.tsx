@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { View } from '../types';
-import { DashboardIcon, OrdersIcon, HoldingsIcon, PositionsIcon, FundsIcon, AppsIcon } from './icons/Icons';
+import { DashboardIcon, OrdersIcon, HoldingsIcon, PositionsIcon, FundsIcon, AppsIcon, MarketIcon } from './icons/Icons';
 
 interface SidebarProps {
   activeView: View;
@@ -33,6 +32,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView }) => {
     { label: 'Orders', icon: <OrdersIcon /> },
     { label: 'Holdings', icon: <HoldingsIcon /> },
     { label: 'Positions', icon: <PositionsIcon /> },
+    { label: 'Market', icon: <MarketIcon /> },
     { label: 'Funds', icon: <FundsIcon /> },
     { label: 'Apps', icon: <AppsIcon /> },
   ];
