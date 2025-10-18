@@ -1,5 +1,10 @@
 export type View = 'Dashboard' | 'Orders' | 'Holdings' | 'Positions' | 'Funds' | 'Apps' | 'Market';
 
+export interface HistoricalDataPoint {
+  date: string;
+  price: number;
+}
+
 export interface Stock {
   symbol: string;
   name: string;
@@ -10,6 +15,8 @@ export interface Stock {
   open?: number;
   high?: number;
   low?: number;
+  prevClose?: number;
+  history?: HistoricalDataPoint[];
 }
 
 export interface Index extends Stock {}

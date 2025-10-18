@@ -15,8 +15,8 @@ const NavItem: React.FC<{
 }> = ({ label, isActive, onClick, children }) => (
   <button
     onClick={onClick}
-    className={`flex flex-col items-center justify-center h-16 w-full text-gray-500 hover:text-blue-600 hover:bg-gray-100 transition-colors duration-200 relative ${
-      isActive ? 'text-blue-600' : ''
+    className={`flex flex-col items-center justify-center h-16 w-full text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 relative ${
+      isActive ? 'text-blue-600 dark:text-blue-500' : ''
     }`}
     title={label}
   >
@@ -38,7 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView }) => {
   ];
 
   return (
-    <nav className="w-20 bg-white border-r border-gray-200 flex flex-col items-center py-4">
+    <nav className="w-20 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col items-center py-4">
       <img src="https://kite.zerodha.com/static/images/kite-logo.svg" alt="Kite Logo" className="w-7 h-7 mb-8" />
       <div className="w-full">
         {navItems.map((item) => (

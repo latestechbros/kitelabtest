@@ -1,13 +1,13 @@
-
 import React from 'react';
-import { MOCK_HOLDINGS } from '../constants';
+import { useStockData } from '../contexts/StockDataContext';
 import { Holding } from '../types';
 
 const Holdings: React.FC = () => {
+    const { holdings } = useStockData();
     
-    const totalCurrentValue = MOCK_HOLDINGS.reduce((acc, h) => acc + h.currentValue, 0);
-    const totalPnl = MOCK_HOLDINGS.reduce((acc, h) => acc + h.pnl, 0);
-    const totalDayChange = MOCK_HOLDINGS.reduce((acc, h) => acc + (h.dayChange * h.qty), 0);
+    const totalCurrentValue = holdings.reduce((acc, h) => acc + h.currentValue, 0);
+    const totalPnl = holdings.reduce((acc, h) => acc + h.pnl, 0);
+    const totalDayChange = holdings.reduce((acc, h) => acc + (h.dayChange * h.qty), 0);
     const totalInvestment = totalCurrentValue - totalPnl;
 
   const PnlText: React.FC<{ value: number, percent?: number }> = ({ value, percent }) => {
@@ -21,8 +21,8 @@ const Holdings: React.FC = () => {
   };
     
   return (
-    <div className="p-4 text-sm">
-      <div className="grid grid-cols-7 gap-4 py-2 px-3 text-gray-500 font-medium border-b">
+    <div className="p-4 text-sm bg-white dark:bg-gray-800 h-full">
+      <div className="grid grid-cols-7 gap-4 py-2 px-3 text-gray-500 dark:text-gray-400 font-medium border-b dark:border-gray-700">
         <div className="col-span-2">Instrument</div>
         <div>Qty.</div>
         <div>Avg. cost</div>
@@ -30,10 +30,10 @@ const Holdings: React.FC = () => {
         <div>Cur. val</div>
         <div>P&L</div>
       </div>
-      <div className="divide-y divide-gray-100">
-        {MOCK_HOLDINGS.map((holding: Holding) => (
+      <div className="divide-y divide-gray-100 dark:divide-gray-700">
+        {holdings.map((holding: Holding) => (
           <div key={holding.symbol} className="grid grid-cols-7 gap-4 py-3 px-3 items-center">
-            <div className="col-span-2 font-medium">{holding.symbol}</div>
+            <div className="col-span-2 font-medium text-gray-800 dark:text-gray-200">{holding.symbol}</div>
             <div>{holding.qty}</div>
             <div>{holding.avgPrice.toFixed(2)}</div>
             <div>{holding.ltp.toFixed(2)}</div>
@@ -42,7 +42,7 @@ const Holdings: React.FC = () => {
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-4 py-4 px-3 font-bold border-t-2 mt-4">
+      <div className="grid grid-cols-7 gap-4 py-4 px-3 font-bold border-t-2 dark:border-gray-700 mt-4">
         <div className="col-span-5 text-right">Total Investment</div>
         <div>{totalInvestment.toFixed(2)}</div>
         <div><PnlText value={totalPnl} /></div>

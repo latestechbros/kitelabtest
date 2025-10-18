@@ -11,7 +11,7 @@ const OrderModal: React.FC<OrderModalProps> = ({ stock, side, onClose }) => {
   const [quantity, setQuantity] = useState(1);
   const [price, setPrice] = useState(stock.price);
   const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT'>('LIMIT');
-  const [product, setProduct] = useState<' intraday' | 'longterm'>('longterm');
+  const [product, setProduct] = useState<'intraday' | 'longterm'>('longterm');
 
   const isBuy = side === 'BUY';
 
@@ -32,7 +32,7 @@ const OrderModal: React.FC<OrderModalProps> = ({ stock, side, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-sm">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-sm">
         <div className={`p-4 rounded-t-lg ${isBuy ? 'bg-blue-600' : 'bg-red-600'}`}>
           <div className="flex justify-between items-center text-white">
             <h2 className="text-lg font-bold">
@@ -50,24 +50,24 @@ const OrderModal: React.FC<OrderModalProps> = ({ stock, side, onClose }) => {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="flex space-x-4">
             <div className="w-1/2">
-              <label htmlFor="quantity" className="block text-sm font-medium text-gray-700">Quantity</label>
+              <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Quantity</label>
               <input
                 type="number"
                 id="quantity"
                 value={quantity}
                 onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value, 10)))}
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-gray-900 dark:text-gray-200"
               />
             </div>
             <div className="w-1/2">
-              <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price</label>
+              <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Price</label>
               <input
                 type="number"
                 id="price"
                 value={price}
                 onChange={(e) => setPrice(parseFloat(e.target.value))}
                 disabled={orderType === 'MARKET'}
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-100"
+                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-100 dark:disabled:bg-gray-600 text-gray-900 dark:text-gray-200"
               />
             </div>
           </div>
@@ -75,23 +75,21 @@ const OrderModal: React.FC<OrderModalProps> = ({ stock, side, onClose }) => {
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
               <input id="limit" name="orderType" type="radio" checked={orderType === 'LIMIT'} onChange={() => setOrderType('LIMIT')} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
-              <label htmlFor="limit" className="ml-2 block text-sm text-gray-900">LIMIT</label>
+              <label htmlFor="limit" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">LIMIT</label>
             </div>
             <div className="flex items-center">
               <input id="market" name="orderType" type="radio" checked={orderType === 'MARKET'} onChange={() => setOrderType('MARKET')} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
-              <label htmlFor="market" className="ml-2 block text-sm text-gray-900">MARKET</label>
+              <label htmlFor="market" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">MARKET</label>
             </div>
           </div>
-
-          {/* This is a simplified product toggle, more logic would be needed for SL, SL-M etc. */}
            <div className="flex items-center space-x-4">
             <div className="flex items-center">
               <input id="longterm" name="product" type="radio" checked={product === 'longterm'} onChange={() => setProduct('longterm')} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
-              <label htmlFor="longterm" className="ml-2 block text-sm text-gray-900">Longterm (CNC)</label>
+              <label htmlFor="longterm" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">Longterm (CNC)</label>
             </div>
             <div className="flex items-center">
               <input id="intraday" name="product" type="radio" checked={product === 'intraday'} onChange={() => setProduct('intraday')} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
-              <label htmlFor="intraday" className="ml-2 block text-sm text-gray-900">Intraday (MIS)</label>
+              <label htmlFor="intraday" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">Intraday (MIS)</label>
             </div>
           </div>
 
@@ -99,7 +97,7 @@ const OrderModal: React.FC<OrderModalProps> = ({ stock, side, onClose }) => {
             <button type="submit" className={`w-24 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isBuy ? 'bg-blue-600 hover:bg-blue-700' : 'bg-red-600 hover:bg-red-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 ${isBuy ? 'focus:ring-blue-500' : 'focus:ring-red-500'}`}>
               {side}
             </button>
-            <button type="button" onClick={onClose} className="w-24 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <button type="button" onClick={onClose} className="w-24 py-2 px-4 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
               Cancel
             </button>
           </div>

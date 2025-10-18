@@ -15,7 +15,6 @@ const MFAPin: React.FC<MFAPinProps> = ({ onPinSuccess }) => {
       newPin[index] = value;
       setPin(newPin);
 
-      // Focus next input
       if (value !== '' && index < 5) {
         inputsRef.current[index + 1]?.focus();
       }
@@ -32,32 +31,31 @@ const MFAPin: React.FC<MFAPinProps> = ({ onPinSuccess }) => {
     e.preventDefault();
     const enteredPin = pin.join('');
     if (enteredPin.length === 6) {
-      // In a real app, you'd validate the PIN here.
-      // For this demo, any 6-digit pin is accepted.
       onPinSuccess();
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-sm p-8 space-y-8 bg-white border border-gray-200 rounded-lg shadow-sm">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="w-full max-w-sm p-8 space-y-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
         <div className="text-center">
             <img src="https://kite.zerodha.com/static/images/kite-logo.svg" alt="Kite Logo" className="w-10 h-10 mx-auto mb-4" />
-            <h1 className="text-2xl font-semibold text-gray-800">Enter PIN</h1>
-            <p className="text-sm text-gray-500 mt-2">Enter your 6-digit App PIN to continue</p>
+            <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">Enter PIN</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Enter your 6-digit App PIN to continue</p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="flex justify-center space-x-2">
             {pin.map((digit, index) => (
               <input
                 key={index}
-                ref={(el) => (inputsRef.current[index] = el)}
+                // Fix: A ref callback should not return a value. Using a block body ensures an implicit void return.
+                ref={(el) => { inputsRef.current[index] = el; }}
                 type="password"
                 maxLength={1}
                 value={digit}
                 onChange={(e) => handleChange(e, index)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
-                className="w-12 h-14 text-center text-2xl font-semibold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-12 h-14 text-center text-2xl font-semibold border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             ))}
@@ -72,7 +70,7 @@ const MFAPin: React.FC<MFAPinProps> = ({ onPinSuccess }) => {
             </button>
           </div>
         </form>
-         <p className="text-xs text-center text-gray-500">
+         <p className="text-xs text-center text-gray-500 dark:text-gray-400">
             <a href="#" className="font-medium text-blue-600 hover:text-blue-500">Forgot PIN?</a>
         </p>
       </div>

@@ -1,7 +1,8 @@
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { StockDataProvider } from './contexts/StockDataContext';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -11,6 +12,10 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <App />
+    <ThemeProvider>
+      <StockDataProvider>
+        <App />
+      </StockDataProvider>
+    </ThemeProvider>
   </React.StrictMode>
 );

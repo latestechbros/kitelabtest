@@ -9,6 +9,7 @@ import Funds from './components/Funds';
 import Market from './components/Market';
 import Login from './components/Login';
 import MFAPin from './components/MFAPin';
+import StockDetail from './components/StockDetail';
 import { View } from './types';
 
 type AuthState = 'login' | 'pin' | 'authenticated';
@@ -16,6 +17,7 @@ type AuthState = 'login' | 'pin' | 'authenticated';
 const App: React.FC = () => {
   const [activeView, setActiveView] = useState<View>('Dashboard');
   const [authState, setAuthState] = useState<AuthState>('login');
+  const [detailedStockSymbol, setDetailedStockSymbol] = useState<string | null>(null);
 
   const handleLoginSuccess = () => {
     setAuthState('pin');
@@ -27,6 +29,16 @@ const App: React.FC = () => {
   
   const handleLogout = () => {
     setAuthState('login');
+    setDetailedStockSymbol(null);
+    setActiveView('Dashboard');
+  };
+  
+  const handleSelectStock = (symbol: string) => {
+    setDetailedStockSymbol(symbol);
+  };
+
+  const handleBackFromDetail = () => {
+    setDetailedStockSymbol(null);
   };
 
   const renderContent = () => {
@@ -40,10 +52,10 @@ const App: React.FC = () => {
       case 'Funds':
         return <Funds />;
       case 'Market':
-          return <Market />;
+        return <Market onSelectStock={handleSelectStock} />;
       case 'Dashboard':
       default:
-        return <Dashboard />;
+        return <Dashboard onSelectStock={handleSelectStock} />;
     }
   };
 
@@ -56,12 +68,16 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 text-gray-800 font-sans">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans">
       <Sidebar activeView={activeView} setActiveView={setActiveView} />
       <div className="flex flex-col flex-1">
         <Header onLogout={handleLogout} />
         <main className="flex-1 overflow-y-auto">
-          {renderContent()}
+          {detailedStockSymbol ? (
+            <StockDetail stockSymbol={detailedStockSymbol} onBack={handleBackFromDetail} />
+          ) : (
+            renderContent()
+          )}
         </main>
       </div>
     </div>
