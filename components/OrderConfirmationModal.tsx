@@ -11,6 +11,15 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({ details
   const isBuy = details.side === 'BUY';
   const estimatedValue = details.quantity * details.price;
 
+  const getProductText = () => {
+      switch (details.product) {
+          case 'longterm': return 'Longterm (CNC)';
+          case 'intraday': return 'Intraday (MIS)';
+          case 'cover': return 'Cover (CO)';
+          default: return '';
+      }
+  }
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-60">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-sm animate-fade-in-up">
@@ -43,9 +52,15 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({ details
               <span className="font-semibold">{details.triggerPrice.toFixed(2)}</span>
             </div>
           )}
+          {details.stoplossPrice !== undefined && (
+             <div className="flex justify-between">
+              <span className="text-gray-500 dark:text-gray-400">Stoploss Price</span>
+              <span className="font-semibold text-red-500">{details.stoplossPrice.toFixed(2)}</span>
+            </div>
+          )}
           <div className="flex justify-between">
             <span className="text-gray-500 dark:text-gray-400">Product</span>
-            <span className="font-semibold">{details.product === 'longterm' ? 'Longterm (CNC)' : 'Intraday (MIS)'}</span>
+            <span className="font-semibold">{getProductText()}</span>
           </div>
           <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
           <div className="flex justify-between font-bold">

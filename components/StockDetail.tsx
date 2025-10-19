@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStockData } from '../contexts/StockDataContext';
 import StockChart from './StockChart';
+import MarketDepth from './MarketDepth';
 import { Stock } from '../types';
 
 interface StockDetailProps {
@@ -70,29 +71,37 @@ const StockDetail: React.FC<StockDetailProps> = ({ stockSymbol, onBack }) => {
         </div>
       </div>
       
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-4 mb-6">
-        <div className="flex items-center justify-between mb-4">
-            <div className="flex space-x-1 rounded-md bg-gray-100 dark:bg-gray-900/50 p-1">
-                {timeframeOptions.map(opt => (
-                    <button
-                        key={opt.label}
-                        onClick={() => setTimeframe(opt.label)}
-                        className={`px-3 py-1 text-xs font-semibold rounded-md transition-all duration-200 ${
-                            timeframe === opt.label
-                            ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
-                            : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'
-                        }`}
-                    >
-                        {opt.label}
-                    </button>
-                ))}
+      <div className="flex flex-col lg:flex-row lg:space-x-6">
+        <div className="flex-1">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-4 mb-6">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex space-x-1 rounded-md bg-gray-100 dark:bg-gray-900/50 p-1">
+                        {timeframeOptions.map(opt => (
+                            <button
+                                key={opt.label}
+                                onClick={() => setTimeframe(opt.label)}
+                                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all duration-200 ${
+                                    timeframe === opt.label
+                                    ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'
+                                }`}
+                            >
+                                {opt.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                <StockChart data={getChartData()} isPositive={isPositive} />
             </div>
         </div>
-        <StockChart data={getChartData()} isPositive={isPositive} />
+        <div className="w-full lg:w-72">
+            <MarketDepth bids={stock.bids ?? []} asks={stock.asks ?? []} />
+        </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-4">
-        <h2 className="text-lg font-semibold mb-3">Market Depth</h2>
+
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-4 mt-6">
+        <h2 className="text-lg font-semibold mb-3">Market Info</h2>
          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 text-center md:text-left">
             <DataPill label="Open" value={stock.open?.toFixed(2)} />
             <DataPill label="High" value={stock.high?.toFixed(2)} />

@@ -12,8 +12,9 @@ const OrderModal: React.FC<OrderModalProps> = ({ stock, side, onClose }) => {
   const [quantity, setQuantity] = useState(1);
   const [price, setPrice] = useState(stock.price);
   const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT' | 'SL' | 'SL-M'>('LIMIT');
-  const [product, setProduct] = useState<'intraday' | 'longterm'>('longterm');
+  const [product, setProduct] = useState<'intraday' | 'longterm' | 'cover'>('longterm');
   const [triggerPrice, setTriggerPrice] = useState(stock.price);
+  const [stoplossPrice, setStoplossPrice] = useState(parseFloat((stock.price * 0.99).toFixed(2)));
   const [confirmationDetails, setConfirmationDetails] = useState<OrderDetails | null>(null);
 
   const isBuy = side === 'BUY';
@@ -29,6 +30,7 @@ const OrderModal: React.FC<OrderModalProps> = ({ stock, side, onClose }) => {
       orderType,
       product,
       triggerPrice: (orderType === 'SL' || orderType === 'SL-M') ? triggerPrice : undefined,
+      stoplossPrice: product === 'cover' ? stoplossPrice : undefined,
     });
   };
 
@@ -42,6 +44,13 @@ const OrderModal: React.FC<OrderModalProps> = ({ stock, side, onClose }) => {
   const handleCancelConfirmation = () => {
     setConfirmationDetails(null);
   };
+
+  const handleProductChange = (newProduct: 'intraday' | 'longterm' | 'cover') => {
+      setProduct(newProduct);
+      if (newProduct === 'cover') {
+          setOrderType('MARKET'); // Cover orders are often market orders
+      }
+  }
 
   return (
     <>
@@ -64,12 +73,16 @@ const OrderModal: React.FC<OrderModalProps> = ({ stock, side, onClose }) => {
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             <div className="flex space-x-2">
               <div className="flex items-center">
-                <input id="longterm" name="product" type="radio" checked={product === 'longterm'} onChange={() => setProduct('longterm')} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
-                <label htmlFor="longterm" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">Longterm (CNC)</label>
+                <input id="longterm" name="product" type="radio" checked={product === 'longterm'} onChange={() => handleProductChange('longterm')} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
+                <label htmlFor="longterm" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">Longterm</label>
               </div>
               <div className="flex items-center">
-                <input id="intraday" name="product" type="radio" checked={product === 'intraday'} onChange={() => setProduct('intraday')} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
-                <label htmlFor="intraday" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">Intraday (MIS)</label>
+                <input id="intraday" name="product" type="radio" checked={product === 'intraday'} onChange={() => handleProductChange('intraday')} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
+                <label htmlFor="intraday" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">Intraday</label>
+              </div>
+              <div className="flex items-center">
+                <input id="cover" name="product" type="radio" checked={product === 'cover'} onChange={() => handleProductChange('cover')} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
+                <label htmlFor="cover" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">Cover</label>
               </div>
             </div>
 
@@ -92,7 +105,7 @@ const OrderModal: React.FC<OrderModalProps> = ({ stock, side, onClose }) => {
                   value={price}
                   step="0.05"
                   onChange={(e) => setPrice(parseFloat(e.target.value))}
-                  disabled={orderType === 'MARKET' || orderType === 'SL-M'}
+                  disabled={orderType === 'MARKET' || orderType === 'SL-M' || product === 'cover'}
                   className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-100 dark:disabled:bg-gray-600 text-gray-900 dark:text-gray-200"
                 />
               </div>
@@ -112,21 +125,36 @@ const OrderModal: React.FC<OrderModalProps> = ({ stock, side, onClose }) => {
               </div>
             )}
             
+            {product === 'cover' && (
+                <div className="w-1/2">
+                    <label htmlFor="stoploss-price" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Stoploss</label>
+                    <input
+                      type="number"
+                      id="stoploss-price"
+                      value={stoplossPrice}
+                      step="0.05"
+                      onChange={(e) => setStoplossPrice(parseFloat(e.target.value))}
+                      className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-gray-900 dark:text-gray-200"
+                      required
+                    />
+                </div>
+            )}
+            
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                 <div className="flex items-center">
-                    <input id="market" name="orderType" type="radio" checked={orderType === 'MARKET'} onChange={() => setOrderType('MARKET')} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
+                    <input id="market" name="orderType" type="radio" checked={orderType === 'MARKET'} onChange={() => setOrderType('MARKET')} disabled={product==='cover'} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500 disabled:opacity-50" />
                     <label htmlFor="market" className="ml-2 block text-gray-900 dark:text-gray-300">Market</label>
                 </div>
                  <div className="flex items-center">
-                    <input id="limit" name="orderType" type="radio" checked={orderType === 'LIMIT'} onChange={() => setOrderType('LIMIT')} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
+                    <input id="limit" name="orderType" type="radio" checked={orderType === 'LIMIT'} onChange={() => setOrderType('LIMIT')} disabled={product==='cover'} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500 disabled:opacity-50" />
                     <label htmlFor="limit" className="ml-2 block text-gray-900 dark:text-gray-300">Limit</label>
                 </div>
                 <div className="flex items-center">
-                    <input id="sl" name="orderType" type="radio" checked={orderType === 'SL'} onChange={() => setOrderType('SL')} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
+                    <input id="sl" name="orderType" type="radio" checked={orderType === 'SL'} onChange={() => setOrderType('SL')} disabled={product==='cover'} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500 disabled:opacity-50" />
                     <label htmlFor="sl" className="ml-2 block text-gray-900 dark:text-gray-300">SL</label>
                 </div>
                 <div className="flex items-center">
-                    <input id="sl-m" name="orderType" type="radio" checked={orderType === 'SL-M'} onChange={() => setOrderType('SL-M')} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
+                    <input id="sl-m" name="orderType" type="radio" checked={orderType === 'SL-M'} onChange={() => setOrderType('SL-M')} disabled={product==='cover'} className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500 disabled:opacity-50" />
                     <label htmlFor="sl-m" className="ml-2 block text-gray-900 dark:text-gray-300">SL-M</label>
                 </div>
             </div>

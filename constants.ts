@@ -1,4 +1,4 @@
-import { Stock, Index, Holding, Position, Order, FundDetails, HistoricalDataPoint } from './types';
+import { Stock, Index, Holding, Position, Order, FundDetails, HistoricalDataPoint, MarketDepthItem, GTTOrder, WatchlistData } from './types';
 
 export const MOCK_INDICES: Index[] = [
   { symbol: 'NIFTY 50', name: 'NIFTY 50', price: 23501.10, change: 183.45, changePercent: 0.78, prevClose: 23317.65 },
@@ -19,12 +19,30 @@ const generateMockHistory = (basePrice: number, points: number = 365): Historica
     const volatility = 0.02;
     price *= (1 + (Math.random() - 0.49) * volatility);
   }
-  // Ensure the last point is close to the basePrice
   history[history.length - 1].price = basePrice;
   return history;
 };
 
-export const MOCK_WATCHLIST: Stock[] = [
+const generateMockMarketDepth = (basePrice: number): { bids: MarketDepthItem[], asks: MarketDepthItem[] } => {
+    const bids: MarketDepthItem[] = [];
+    const asks: MarketDepthItem[] = [];
+    const tick = 0.05;
+    for (let i = 1; i <= 5; i++) {
+        bids.push({
+            price: parseFloat((basePrice - tick * i * (1 + Math.random() * 0.1)).toFixed(2)),
+            orders: Math.floor(Math.random() * 20) + 1,
+            qty: Math.floor(Math.random() * 500) + 50
+        });
+        asks.push({
+            price: parseFloat((basePrice + tick * i * (1 + Math.random() * 0.1)).toFixed(2)),
+            orders: Math.floor(Math.random() * 20) + 1,
+            qty: Math.floor(Math.random() * 500) + 50
+        });
+    }
+    return { bids, asks };
+};
+
+const MOCK_WATCHLIST_STOCKS: Stock[] = [
   { symbol: 'RELIANCE', name: 'Reliance Industries', price: 2959.00, change: 50.45, changePercent: 1.73, prevClose: 2908.55 },
   { symbol: 'TCS', name: 'Tata Consultancy Services', price: 3816.00, change: -21.55, changePercent: -0.56, prevClose: 3837.55 },
   { symbol: 'HDFCBANK', name: 'HDFC Bank Ltd.', price: 1663.05, change: 6.85, changePercent: 0.41, prevClose: 1656.20 },
@@ -36,8 +54,15 @@ export const MOCK_WATCHLIST: Stock[] = [
   { symbol: 'WIPRO', name: 'Wipro Ltd.', price: 490.85, change: 1.60, changePercent: 0.33, prevClose: 489.25 },
 ];
 
+export const MOCK_WATCHLISTS: WatchlistData = {
+    "My Watchlist": MOCK_WATCHLIST_STOCKS.map(s => s.symbol),
+    "Nifty 50": ['RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK', 'HINDUNILVR', 'ITC', 'SBIN'],
+    "IT Sector": ['TCS', 'INFY', 'WIPRO'],
+    "Banking": ['HDFCBANK', 'ICICIBANK', 'SBIN', 'KOTAKBANK', 'AXISBANK'],
+};
+
 export const MOCK_ALL_STOCKS: Stock[] = [
-  ...MOCK_WATCHLIST,
+  ...MOCK_WATCHLIST_STOCKS,
   { symbol: 'TATAMOTORS', name: 'Tata Motors Ltd.', price: 975.30, change: -5.15, changePercent: -0.53, volume: 15700000, open: 980.00, high: 982.50, low: 971.00, prevClose: 980.45 },
   { symbol: 'ITC', name: 'ITC Ltd.', price: 423.50, change: -2.10, changePercent: -0.49, volume: 12300000, open: 425.00, high: 426.50, low: 422.00, prevClose: 425.60 },
   { symbol: 'HINDUNILVR', name: 'Hindustan Unilever', price: 2540.80, change: 15.20, changePercent: 0.60, volume: 1800000, open: 2525.00, high: 2550.00, low: 2520.10, prevClose: 2525.60 },
@@ -48,7 +73,11 @@ export const MOCK_ALL_STOCKS: Stock[] = [
   { symbol: 'ASIANPAINT', name: 'Asian Paints Ltd.', price: 2880.00, change: 5.40, changePercent: 0.19, volume: 1100000, open: 2875.00, high: 2895.00, low: 2870.00, prevClose: 2874.60 },
   { symbol: 'TITAN', name: 'Titan Company Ltd.', price: 3410.20, change: -25.80, changePercent: -0.75, volume: 1300000, open: 3435.00, high: 3440.00, low: 3405.00, prevClose: 3436.00 },
   { symbol: 'ULTRACEMCO', name: 'UltraTech Cement', price: 10850.00, change: 120.00, changePercent: 1.12, volume: 350000, open: 10730.00, high: 10900.00, low: 10710.00, prevClose: 10730.00 },
-].map(stock => ({ ...stock, history: generateMockHistory(stock.price) }));
+].map(stock => ({ 
+    ...stock, 
+    history: generateMockHistory(stock.price),
+    ...generateMockMarketDepth(stock.price)
+}));
 
 
 export const MOCK_HOLDINGS: Holding[] = [
@@ -69,6 +98,11 @@ export const MOCK_ORDERS: Order[] = [
     { id: '2345680', symbol: 'WIPRO', type: 'MARKET', side: 'SELL', qty: 50, avgPrice: 490.85, status: 'COMPLETE', time: '11:20:05' },
     { id: '2345681', symbol: 'RELIANCE', type: 'LIMIT', side: 'BUY', qty: 5, avgPrice: 2950.00, status: 'PENDING', time: '13:15:40' },
     { id: '2345682', symbol: 'TCS', type: 'LIMIT', side: 'BUY', qty: 10, avgPrice: 3800.00, status: 'REJECTED', time: '14:02:33' }
+];
+
+export const MOCK_GTT_ORDERS: GTTOrder[] = [
+    { id: 'gtt001', symbol: 'HDFCBANK', side: 'BUY', qty: 10, price: 1600.00, triggerPrice: 1605.00, status: 'ACTIVE', createdAt: '2024-07-15' },
+    { id: 'gtt002', symbol: 'BHARTIARTL', side: 'SELL', qty: 20, price: 1450.00, triggerPrice: 1445.00, status: 'ACTIVE', createdAt: '2024-07-18' },
 ];
 
 export const MOCK_FUND_DETAILS: FundDetails = {

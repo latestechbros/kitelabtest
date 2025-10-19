@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
-import { Stock, Index, Holding, Position, Order } from '../types';
-import { MOCK_ALL_STOCKS, MOCK_INDICES, MOCK_HOLDINGS, MOCK_POSITIONS, MOCK_ORDERS } from '../constants';
+import { Stock, Index, Holding, Position, Order, GTTOrder } from '../types';
+import { MOCK_ALL_STOCKS, MOCK_INDICES, MOCK_HOLDINGS, MOCK_POSITIONS, MOCK_ORDERS, MOCK_GTT_ORDERS } from '../constants';
 import { produce } from 'https://esm.sh/immer@10.1.1';
 
 interface StockDataContextType {
@@ -9,7 +9,9 @@ interface StockDataContextType {
   holdings: Holding[];
   positions: Position[];
   orders: Order[];
+  gttOrders: GTTOrder[];
   setOrders: React.Dispatch<React.SetStateAction<Order[]>>;
+  setGttOrders: React.Dispatch<React.SetStateAction<GTTOrder[]>>;
   getStockBySymbol: (symbol: string) => Stock | undefined;
 }
 
@@ -21,6 +23,7 @@ export const StockDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [holdings, setHoldings] = useState<Holding[]>(MOCK_HOLDINGS);
   const [positions, setPositions] = useState<Position[]>(MOCK_POSITIONS);
   const [orders, setOrders] = useState<Order[]>(MOCK_ORDERS);
+  const [gttOrders, setGttOrders] = useState<GTTOrder[]>(MOCK_GTT_ORDERS);
 
   const stocksRef = useRef(stocks);
   stocksRef.current = stocks;
@@ -40,11 +43,18 @@ export const StockDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
               stock.change = stock.price - stock.prevClose;
               stock.changePercent = (stock.change / stock.prevClose) * 100;
 
-              // Also update OHLC realistically
               if (stock.low && stock.high) {
                 stock.low = Math.min(stock.low, stock.price);
                 stock.high = Math.max(stock.high, stock.price);
               }
+              
+              // Simulate market depth changes
+              stock.bids?.forEach(bid => {
+                  bid.qty = Math.max(10, bid.qty + Math.floor((Math.random() - 0.5) * 50));
+              });
+              stock.asks?.forEach(ask => {
+                  ask.qty = Math.max(10, ask.qty + Math.floor((Math.random() - 0.5) * 50));
+              });
             }
           }
         })
@@ -76,8 +86,6 @@ export const StockDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setHoldings(currentHoldings => 
         produce(currentHoldings, draft => {
           draft.forEach(holding => {
-            // FIX: Explicitly cast the result of stockMap.get to provide the correct type to TypeScript.
-            // The type inference seems to fail within the immer 'produce' function, possibly due to how types are loaded from the CDN import.
             const latestStock = stockMap.get(holding.symbol) as Stock | undefined;
             if (latestStock) {
               holding.ltp = latestStock.price;
@@ -93,8 +101,6 @@ export const StockDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       setPositions(currentPositions =>
         produce(currentPositions, draft => {
-            // This is a simplification; real futures P&L is more complex
-            // For this demo, we'll just simulate a small random change
             draft.forEach(pos => {
                 pos.ltp *= (1 + (Math.random() - 0.5) * 0.001);
                 pos.pnl = (pos.ltp - pos.avgPrice) * pos.qty;
@@ -110,7 +116,7 @@ export const StockDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   return (
-    <StockDataContext.Provider value={{ stocks, indices, holdings, positions, orders, setOrders, getStockBySymbol }}>
+    <StockDataContext.Provider value={{ stocks, indices, holdings, positions, orders, gttOrders, setOrders, setGttOrders, getStockBySymbol }}>
       {children}
     </StockDataContext.Provider>
   );
