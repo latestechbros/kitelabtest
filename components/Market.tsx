@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useStockData } from '../contexts/StockDataContext';
 import { Stock } from '../types';
-import { SearchIcon } from './icons/Icons';
+import { SearchIconLarge } from './icons/Icons';
 import OrderModal from './OrderModal';
 import StockAnalysisModal from './StockAnalysisModal';
 
@@ -103,7 +103,7 @@ const Market: React.FC<{ onSelectStock: (symbol: string) => void }> = ({ onSelec
        <div className="mb-4">
         <div className="relative">
           <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-            <SearchIcon />
+            <SearchIconLarge />
           </span>
           <input
             type="text"

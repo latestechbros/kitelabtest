@@ -1,5 +1,5 @@
 {
-  "name": "Copy of Kite UI Clone",
+  "name": "Kite UI Clone",
   "description": "A high-fidelity UI/UX clone of the Zerodha Kite trading platform, built with React, TypeScript, and Tailwind CSS. Features mock data for a realistic trading dashboard experience and a stock analysis feature powered by the Gemini API.",
   "requestFramePermissions": []
 }

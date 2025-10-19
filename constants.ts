@@ -6,7 +6,7 @@ export const MOCK_INDICES: Index[] = [
   { symbol: 'SENSEX', name: 'SENSEX', price: 77209.90, change: 620.73, changePercent: 0.81, prevClose: 76589.17 },
 ];
 
-const generateMockHistory = (basePrice: number, points: number = 90): HistoricalDataPoint[] => {
+const generateMockHistory = (basePrice: number, points: number = 365): HistoricalDataPoint[] => {
   const history: HistoricalDataPoint[] = [];
   let price = basePrice * (1 - (Math.random() * 0.2 - 0.1)); // Start from a point in the past
   for (let i = 0; i < points; i++) {

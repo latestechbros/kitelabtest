@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
-import { Stock, Index, Holding, Position } from '../types';
-import { MOCK_ALL_STOCKS, MOCK_INDICES, MOCK_HOLDINGS, MOCK_POSITIONS } from '../constants';
+import { Stock, Index, Holding, Position, Order } from '../types';
+import { MOCK_ALL_STOCKS, MOCK_INDICES, MOCK_HOLDINGS, MOCK_POSITIONS, MOCK_ORDERS } from '../constants';
 import { produce } from 'https://esm.sh/immer@10.1.1';
 
 interface StockDataContextType {
@@ -8,6 +8,8 @@ interface StockDataContextType {
   indices: Index[];
   holdings: Holding[];
   positions: Position[];
+  orders: Order[];
+  setOrders: React.Dispatch<React.SetStateAction<Order[]>>;
   getStockBySymbol: (symbol: string) => Stock | undefined;
 }
 
@@ -18,6 +20,7 @@ export const StockDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [indices, setIndices] = useState<Index[]>(MOCK_INDICES);
   const [holdings, setHoldings] = useState<Holding[]>(MOCK_HOLDINGS);
   const [positions, setPositions] = useState<Position[]>(MOCK_POSITIONS);
+  const [orders, setOrders] = useState<Order[]>(MOCK_ORDERS);
 
   const stocksRef = useRef(stocks);
   stocksRef.current = stocks;
@@ -27,7 +30,7 @@ export const StockDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       // Update a few random stocks
       setStocks(currentStocks => 
         produce(currentStocks, draft => {
-          for (let i = 0; i < 3; i++) {
+          for (let i = 0; i < 5; i++) {
             const randomIndex = Math.floor(Math.random() * draft.length);
             const stock = draft[randomIndex];
             if (stock && stock.prevClose) {
@@ -61,19 +64,21 @@ export const StockDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
            }
         })
       );
-    }, 2000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
   
   // Recalculate holdings and positions when stock prices change
   useEffect(() => {
-      const stockMap = new Map(stocksRef.current.map(s => [s.symbol, s]));
+      const stockMap = new Map(stocks.map(s => [s.symbol, s]));
       
       setHoldings(currentHoldings => 
         produce(currentHoldings, draft => {
           draft.forEach(holding => {
-            const latestStock = stockMap.get(holding.symbol);
+            // FIX: Explicitly cast the result of stockMap.get to provide the correct type to TypeScript.
+            // The type inference seems to fail within the immer 'produce' function, possibly due to how types are loaded from the CDN import.
+            const latestStock = stockMap.get(holding.symbol) as Stock | undefined;
             if (latestStock) {
               holding.ltp = latestStock.price;
               holding.currentValue = holding.qty * holding.ltp;
@@ -105,7 +110,7 @@ export const StockDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   return (
-    <StockDataContext.Provider value={{ stocks, indices, holdings, positions, getStockBySymbol }}>
+    <StockDataContext.Provider value={{ stocks, indices, holdings, positions, orders, setOrders, getStockBySymbol }}>
       {children}
     </StockDataContext.Provider>
   );

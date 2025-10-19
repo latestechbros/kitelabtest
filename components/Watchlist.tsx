@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MOCK_WATCHLIST } from '../constants';
-import { SearchIcon } from './icons/Icons';
+import { SearchIconLarge } from './icons/Icons';
 import StockRow from './StockRow';
 import { useStockData } from '../contexts/StockDataContext';
 
@@ -24,7 +24,7 @@ const Watchlist: React.FC<WatchlistProps> = ({ onSelectStock }) => {
       <div className="p-2 border-b border-gray-200 dark:border-gray-700">
         <div className="relative">
           <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-            <SearchIcon />
+            <SearchIconLarge />
           </span>
           <input
             type="text"

@@ -71,7 +71,7 @@ const App: React.FC = () => {
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans">
       <Sidebar activeView={activeView} setActiveView={setActiveView} />
       <div className="flex flex-col flex-1">
-        <Header onLogout={handleLogout} />
+        <Header onLogout={handleLogout} onSelectStock={handleSelectStock} />
         <main className="flex-1 overflow-y-auto">
           {detailedStockSymbol ? (
             <StockDetail stockSymbol={detailedStockSymbol} onBack={handleBackFromDetail} />

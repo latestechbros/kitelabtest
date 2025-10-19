@@ -77,3 +77,14 @@ export interface FundDetails {
         availableMargin: number;
     }
 }
+
+export interface OrderDetails {
+  symbol: string;
+  name: string;
+  side: 'BUY' | 'SELL';
+  quantity: number;
+  price: number;
+  orderType: 'MARKET' | 'LIMIT' | 'SL' | 'SL-M';
+  product: 'intraday' | 'longterm';
+  triggerPrice?: number;
+}

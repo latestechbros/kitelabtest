@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useStockData } from '../contexts/StockDataContext';
 import StockChart from './StockChart';
 import { Stock } from '../types';
@@ -7,6 +7,8 @@ interface StockDetailProps {
   stockSymbol: string;
   onBack: () => void;
 }
+
+type Timeframe = '1D' | '5D' | '1M' | '6M' | '1Y';
 
 const DataPill: React.FC<{ label: string; value: string | number | undefined }> = ({ label, value }) => (
   <div>
@@ -18,6 +20,22 @@ const DataPill: React.FC<{ label: string; value: string | number | undefined }> 
 const StockDetail: React.FC<StockDetailProps> = ({ stockSymbol, onBack }) => {
   const { getStockBySymbol } = useStockData();
   const stock = getStockBySymbol(stockSymbol);
+  const [timeframe, setTimeframe] = useState<Timeframe>('1M');
+
+  const timeframeOptions: { label: Timeframe; days: number }[] = [
+    { label: '1D', days: 2 },
+    { label: '5D', days: 5 },
+    { label: '1M', days: 30 },
+    { label: '6M', days: 180 },
+    { label: '1Y', days: 365 },
+  ];
+
+  const getChartData = () => {
+    if (!stock?.history) return [];
+    const days = timeframeOptions.find(t => t.label === timeframe)?.days ?? 30;
+    return stock.history.slice(Math.max(0, stock.history.length - days));
+  };
+
 
   if (!stock) {
     return (
@@ -53,7 +71,24 @@ const StockDetail: React.FC<StockDetailProps> = ({ stockSymbol, onBack }) => {
       </div>
       
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-4 mb-6">
-        <StockChart data={stock.history ?? []} isPositive={isPositive} />
+        <div className="flex items-center justify-between mb-4">
+            <div className="flex space-x-1 rounded-md bg-gray-100 dark:bg-gray-900/50 p-1">
+                {timeframeOptions.map(opt => (
+                    <button
+                        key={opt.label}
+                        onClick={() => setTimeframe(opt.label)}
+                        className={`px-3 py-1 text-xs font-semibold rounded-md transition-all duration-200 ${
+                            timeframe === opt.label
+                            ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                            : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'
+                        }`}
+                    >
+                        {opt.label}
+                    </button>
+                ))}
+            </div>
+        </div>
+        <StockChart data={getChartData()} isPositive={isPositive} />
       </div>
 
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-4">
