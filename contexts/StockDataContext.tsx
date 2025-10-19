@@ -30,13 +30,11 @@ export const StockDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Update a few random stocks
+      // Update stocks with a certain probability to make it look more lively
       setStocks(currentStocks => 
         produce(currentStocks, draft => {
-          for (let i = 0; i < 5; i++) {
-            const randomIndex = Math.floor(Math.random() * draft.length);
-            const stock = draft[randomIndex];
-            if (stock && stock.prevClose) {
+          draft.forEach(stock => {
+            if (stock && stock.prevClose && Math.random() < 0.3) { // 30% chance to update each second
               const changeFactor = (Math.random() - 0.5) * 0.01; // +/- 0.5%
               const newPrice = stock.price * (1 + changeFactor);
               stock.price = parseFloat(newPrice.toFixed(2));
@@ -56,22 +54,22 @@ export const StockDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                   ask.qty = Math.max(10, ask.qty + Math.floor((Math.random() - 0.5) * 50));
               });
             }
-          }
+          });
         })
       );
 
-      // Update a random index
+      // Update all indices every tick
       setIndices(currentIndices =>
         produce(currentIndices, draft => {
-           const randomIndex = Math.floor(Math.random() * draft.length);
-           const index = draft[randomIndex];
-           if (index && index.prevClose) {
-              const changeFactor = (Math.random() - 0.5) * 0.005; // +/- 0.25%
-              const newPrice = index.price * (1 + changeFactor);
-              index.price = parseFloat(newPrice.toFixed(2));
-              index.change = index.price - index.prevClose;
-              index.changePercent = (index.change / index.prevClose) * 100;
-           }
+           draft.forEach(index => {
+             if (index && index.prevClose) {
+                const changeFactor = (Math.random() - 0.5) * 0.005; // +/- 0.25%
+                const newPrice = index.price * (1 + changeFactor);
+                index.price = parseFloat(newPrice.toFixed(2));
+                index.change = index.price - index.prevClose;
+                index.changePercent = (index.change / index.prevClose) * 100;
+             }
+           });
         })
       );
     }, 1000);
@@ -79,10 +77,13 @@ export const StockDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return () => clearInterval(interval);
   }, []);
   
-  // Recalculate holdings and positions when stock prices change
+  // Recalculate holdings and positions when stock/index prices change
   useEffect(() => {
-      const stockMap = new Map(stocks.map(s => [s.symbol, s]));
-      
+      // FIX: Explicitly type maps to help TypeScript correctly infer the types.
+      // This prevents errors where properties are accessed on an 'unknown' type.
+      const stockMap: Map<string, Stock> = new Map(stocks.map(s => [s.symbol, s]));
+      const indexMap: Map<string, Index> = new Map(indices.map(i => [i.symbol, i]));
+
       setHoldings(currentHoldings => 
         produce(currentHoldings, draft => {
           draft.forEach(holding => {
@@ -101,15 +102,39 @@ export const StockDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       setPositions(currentPositions =>
         produce(currentPositions, draft => {
+            const nifty = indexMap.get('NIFTY 50');
+            const bankNifty = indexMap.get('NIFTY BANK');
+            
             draft.forEach(pos => {
-                pos.ltp *= (1 + (Math.random() - 0.5) * 0.001);
+                let basis = 0;
+                let indexPrice = 0;
+                let indexPrevClose = 0;
+
+                if (pos.symbol.includes('NIFTY') && !pos.symbol.includes('BANKNIFTY') && nifty?.prevClose) {
+                    indexPrice = nifty.price;
+                    indexPrevClose = nifty.prevClose;
+                } else if (pos.symbol.includes('BANKNIFTY') && bankNifty?.prevClose) {
+                    indexPrice = bankNifty.price;
+                    indexPrevClose = bankNifty.prevClose;
+                }
+
+                if (indexPrice && indexPrevClose) {
+                    // basis is the premium/discount of the future over the spot price, which we assume is constant for this simulation
+                    basis = pos.avgPrice - indexPrevClose;
+                    const newLtp = indexPrice + basis + (Math.random() - 0.5) * 5; // Add some random noise to simulate market fluctuations
+                    pos.ltp = parseFloat(newLtp.toFixed(2));
+                } else {
+                    // Fallback to a random walk if the underlying index isn't found
+                    pos.ltp *= (1 + (Math.random() - 0.5) * 0.001);
+                }
+                
                 pos.pnl = (pos.ltp - pos.avgPrice) * pos.qty;
-                pos.m2m = pos.pnl; // Simplified M2M
+                pos.m2m = pos.pnl; // Simplified M2M for demo
             });
         })
       );
 
-  }, [stocks]);
+  }, [stocks, indices]);
 
   const getStockBySymbol = (symbol: string) => {
     return stocks.find(s => s.symbol === symbol);
